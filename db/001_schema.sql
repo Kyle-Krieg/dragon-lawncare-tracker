@@ -11,7 +11,7 @@ role VARCHAR(15) NOT NULL CHECK (role IN ('employee', 'supervisor', 'admin'))
 
 CREATE TABLE IF NOT EXISTS areas(
 area_id BIGSERIAL PRIMARY KEY,
-area_name VARCHAR(30) NOT NULL,
+area_name VARCHAR(120) NOT NULL,
 area_type VARCHAR(30) NOT NULL,
 active BOOLEAN NOT NULL DEFAULT TRUE,
 created_at TIMESTAMPTZ DEFAULT NOW()

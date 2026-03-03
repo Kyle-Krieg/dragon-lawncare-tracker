@@ -1,3 +1,4 @@
+
 from flask import Flask, jsonify
 import os
 
@@ -42,9 +43,7 @@ def get_task(task_id):
         return jsonify(task)
     else:
         return jsonify({"error": "Task not found"}), 4041
-@app.put("/tasks/<int:task_id>")
-def update_task(task_id):    # Placeholder for task update logic
-    return jsonify({"message": "Task update endpoint is not implemented yet"}), 501
+
 @app.post("/tasks/<int:task_id>/complete")
 def complete_task(task_id):  
     with get_conn() as conn:
@@ -63,3 +62,7 @@ def complete_task(task_id):
         return jsonify(updated_task)
     else:
         return jsonify({"error": "Task not found"}), 404
+
+@app.put("/tasks/<int:task_id>")
+def update_task(task_id):    # Placeholder for task update logic
+    return jsonify({"message": "Task update endpoint is not implemented yet"}), 501

@@ -42,7 +42,7 @@ def get_task(task_id):
     if task:
         return jsonify(task)
     else:
-        return jsonify({"error": "Task not found"}), 4041
+        return jsonify({"error": "Task not found"}), 404
 
 @app.post("/tasks/<int:task_id>/complete")
 def complete_task(task_id):  
@@ -51,8 +51,9 @@ def complete_task(task_id):
             cur.execute(
                         """
                         UPDATE task
-                        SET prev_status = status, 
-                        status = 'completed' 
+                        SET status = 'completed',
+                        completed_at = NOW(),
+                        completed_by = assigned_to
                         WHERE task_id = %s 
                         RETURNING *;
                         """, 
@@ -63,6 +64,20 @@ def complete_task(task_id):
     else:
         return jsonify({"error": "Task not found"}), 404
 
-@app.put("/tasks/<int:task_id>")
-def update_task(task_id):    # Placeholder for task update logic
-    return jsonify({"message": "Task update endpoint is not implemented yet"}), 501
+@app.post("/tasks/<int:task_id>/assign")
+def assign_task(task_id):   
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                        """
+                        UPDATE task
+                        SET status = 'assigned'
+                        WHERE task_id = %s 
+                        RETURNING *;
+                        """, 
+                        (task_id,))
+            updated_task = cur.fetchone()
+    if updated_task:
+        return jsonify(updated_task)
+    else:
+        return jsonify({"error": "Task not found"}), 404

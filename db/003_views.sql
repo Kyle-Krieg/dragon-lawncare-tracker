@@ -6,10 +6,10 @@ SELECT
     tt.task_name,
     t.scheduled_for,
     t.status,
-    t.assigned_to,
+    t.assigned_to AS assigned_to_id,
     COALESCE(CONCAT(p.first_name, ' ', p.last_name), '(unassigned)') AS assigned_to_name,
     t.completed_at,
-    t.completed_by,
+    t.completed_by AS completed_by_id,
     t.notes,
     t.created_at
 FROM task t
@@ -33,25 +33,8 @@ WHERE status = 'completed'
   AND completed_at IS NOT NULL
 ORDER BY completed_at DESC, task_id;
 
-CREATE OR REPLACE VIEW employee_tasks AS
-SELECT
-    task_id,
-    area_name,
-    task_name,
-    scheduled_for,
-    status,
-    assigned_to
-FROM task_list
-WHERE status <> 'completed';
-
-CREATE OR REPLACE VIEW supervisor_task_list AS
-SELECT
-    task_id,
-    area_name,
-    task_name,
-    scheduled_for,
-    status,
-    assigned_to
+CREATE OR REPLACE VIEW assignable_tasks AS
+SELECT *
 FROM task_list
 WHERE status = 'unassigned'
 ORDER BY scheduled_for, task_id;

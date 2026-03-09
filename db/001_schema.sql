@@ -37,6 +37,5 @@ assigned_to BIGINT REFERENCES people(person_id),
 completed_by BIGINT REFERENCES people(person_id),
 completed_at TIMESTAMPTZ,
 
-notes TEXT,
 created_at TIMESTAMPTZ DEFAULT NOW()
 );

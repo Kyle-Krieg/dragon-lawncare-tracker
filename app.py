@@ -1,6 +1,8 @@
 
-from flask import Flask, jsonify
+from flask import Flask, jsonify, render_template
 import os
+
+import datetime
 
 import psycopg
 from psycopg.rows import dict_row
@@ -16,11 +18,24 @@ def get_conn():
         raise RuntimeError("DATABASE_URL environment variable not set")
     return psycopg.connect(db_url, row_factory=dict_row)
 
+# Basic routes to serve the HTML templates for the different user roles
 @app.get("/")
 def home():
-    return {"status": "lawncare backend is running"}
+    return render_template("index.html")
 
-# Endpoint to retrieve all tasks with area and assignment information.
+@app.get("/employee")
+def employee_page():
+    return render_template("employee.html")
+
+@app.get("/supervisor")
+def supervisor_page():
+    return render_template("supervisor.html")
+
+@app.get("/admin")
+def admin_page():
+    return render_template("admin.html")
+
+# Endpoint to retrieve all tasks with area and assignment information
 @app.get("/tasks")
 def get_tasks():
     with get_conn() as conn:
@@ -29,7 +44,7 @@ def get_tasks():
             tasks = cur.fetchall()
     return jsonify(tasks)
 
-# Endpoint to get a specific task by ID, including details about the assigned employee and completion information if applicable.
+# Endpoint to get a specific task by ID, including details about the assigned employee and completion information if applicable
 @app.get("/tasks/<int:task_id>")
 def get_task(task_id):
     with get_conn() as conn:
@@ -46,7 +61,8 @@ def get_task(task_id):
     else:
         return jsonify({"error": "Task not found"}), 404
     
-# Endpoint to mark a task as completed. This will update the task's status to 'completed', set the completed_at timestamp, and record which employee completed the task based on the assigned_to field.
+# Endpoint to mark a task as completed. This will update the task's status to 'completed',
+# set the completed_at timestamp, and record which employee completed the task based on the assigned_to field
 @app.post("/tasks/<int:task_id>/complete")
 def complete_task(task_id):  
     with get_conn() as conn:
@@ -85,8 +101,8 @@ def get_employee_tasks(employee_id):
             tasks = cur.fetchall()
     return jsonify(tasks)
 
-# Endpoint to assign a task to an employee. 
-# This will update the task's status to 'assigned' and set the assigned_to field to the specified employee ID.
+# Endpoint to assign a task to an employee
+# This will update the task's status to 'assigned' and set the assigned_to field to the specified employee ID
 @app.post("/employees/<int:employee_id>/tasks/<int:task_id>/assign")
 def assign_task(employee_id, task_id):
     with get_conn() as conn:
@@ -106,8 +122,8 @@ def assign_task(employee_id, task_id):
     else:
         return jsonify({"error": "Task not found"}), 404
 
-# Endpoint to unassign a task from an employee. 
-# This will update the task's status to 'unassigned' and set the assigned_to field to NULL.
+# Endpoint to unassign a task from an employee
+# This will update the task's status to 'unassigned' and set the assigned_to field to NULL
 @app.post("/tasks/<int:task_id>/unassign")
 def unassign_task(task_id):
     with get_conn() as conn:
@@ -127,8 +143,8 @@ def unassign_task(task_id):
     else:
         return jsonify({"error": "Task not found"}), 404
     
-# Admin endpoint to reopen completed tasks in case of mistakes or changes in circumstances. 
-# Reopened tasks will be set to 'assigned' if they were previously assigned, or 'unassigned' if they were not.
+# Admin endpoint to reopen completed tasks in case of mistakes or changes in circumstances
+# Reopened tasks will be set to 'assigned' if they were previously assigned, or 'unassigned' if they were not
 @app.post("/tasks/<int:task_id>/reopen")
 def reopen_task(task_id):
     with get_conn() as conn:
@@ -211,5 +227,30 @@ def get_completed_this_season():
                         AND completed_at >= date_trunc('year', now())
                         ORDER BY completed_at DESC;
                         """)
+            tasks = cur.fetchall()
+    return jsonify(tasks)
+
+@app.get("/people")
+def get_people():
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute("""
+                SELECT person_id, first_name, last_name, role
+                FROM people
+                WHERE active = TRUE
+                ORDER BY last_name, first_name;
+            """)
+            people = cur.fetchall()
+    return jsonify(people)
+
+@app.get("/assignable_tasks")
+def get_assignable_tasks():
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute("""
+                SELECT *
+                FROM assignable_tasks
+                ORDER BY scheduled_for, task_id;
+            """)
             tasks = cur.fetchall()
     return jsonify(tasks)

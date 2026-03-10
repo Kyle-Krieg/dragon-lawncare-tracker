@@ -1,16 +1,16 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Employee Page</title>
+    <title>Supervisor Page</title>
 </head>
 <body>
-    <h1>Employee Page</h1>
+    <h1>Supervisor Dashboard</h1>
     <a href="/">Home</a>
 
     <h2>Select Employee</h2>
     <select id="employee-select"></select>
 
-    <h2>My Tasks</h2>
+    <h2>Available Tasks</h2>
     <div id="task-list"></div>
 
     <script>
@@ -19,37 +19,36 @@
         fetch("/people")
             .then(response => response.json())
             .then(people => {
-                const employees = people.filter(person => person.role === "employee");
                 const select = document.getElementById("employee-select");
 
-                employees.forEach(person => {
+                people.forEach(person => {
                     const option = document.createElement("option");
                     option.value = person.person_id;
-                    option.textContent = person.first_name + " " + person.last_name;
+                    option.textContent = person.first_name + " " + person.last_name + " (" + person.role + ")";
                     select.appendChild(option);
                 });
 
-                if (employees.length > 0) {
-                    selectedEmployeeId = employees[0].person_id;
+                if (people.length > 0) {
+                    selectedEmployeeId = people[0].person_id;
                     select.value = selectedEmployeeId;
-                    loadTasks();
                 }
 
                 select.addEventListener("change", () => {
                     selectedEmployeeId = select.value;
-                    loadTasks();
                 });
+
+                loadTasks();
             });
 
         function loadTasks() {
-            fetch(`/employees/${selectedEmployeeId}/tasks`)
+            fetch("/assignable_tasks")
                 .then(response => response.json())
                 .then(tasks => {
                     const list = document.getElementById("task-list");
                     list.innerHTML = "";
 
                     if (tasks.length === 0) {
-                        list.innerHTML = "<p>No tasks assigned.</p>";
+                        list.innerHTML = "<p>No unassigned tasks available.</p>";
                         return;
                     }
 
@@ -60,7 +59,7 @@
                         item.innerHTML = `
                             <strong>${task.area_name}</strong> - ${task.task_name}
                             (${task.scheduled_for})
-                            <button onclick="completeTask(${task.task_id})">Complete</button>
+                            <button onclick="assignTask(${task.task_id})">Assign</button>
                         `;
 
                         list.appendChild(item);
@@ -68,8 +67,13 @@
                 });
         }
 
-        function completeTask(taskId) {
-            fetch(`/tasks/${taskId}/complete`, {
+        function assignTask(taskId) {
+            if (!selectedEmployeeId) {
+                alert("Please select an employee first.");
+                return;
+            }
+
+            fetch(`/employees/${selectedEmployeeId}/tasks/${taskId}/assign`, {
                 method: "POST"
             })
             .then(response => response.json())

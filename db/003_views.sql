@@ -10,7 +10,6 @@ SELECT
     COALESCE(CONCAT(p.first_name, ' ', p.last_name), '(unassigned)') AS assigned_to_name,
     t.completed_at,
     t.completed_by AS completed_by_id,
-    t.notes,
     t.created_at
 FROM task t
 JOIN areas a ON t.area_id = a.area_id

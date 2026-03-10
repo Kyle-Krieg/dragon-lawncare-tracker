@@ -44,7 +44,7 @@ INSERT INTO tasktype (task_name) VALUES
 ('general cleanup');
 
 
-INSERT INTO task (area_id, tasktype, scheduled_for, status) VALUES
+INSERT INTO task (area_id, tasktype_id, scheduled_for, status) VALUES
 (1, 1, CURRENT_DATE, 'unassigned'),
 (2, 2, CURRENT_DATE + INTERVAL '1 day', 'unassigned'),
 (3, 3, CURRENT_DATE + INTERVAL '2 days', 'unassigned'),

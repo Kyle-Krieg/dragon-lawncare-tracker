@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}Lawncare Scheduler{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="page-shell">
+
+    <!-- Shared header used across all pages -->
+    <header class="site-header">
+        <div class="header-text">
+            <h1>{% block header_title %}Lawncare Scheduler{% endblock %}</h1>
+            <p class="subtitle">{% block header_subtitle %}Task scheduling and reporting{% endblock %}</p>
+        </div>
+
+        <div class="logo-wrap">
+            <img src="{{ url_for('static', filename='images/top-logo.svg') }}" alt="School Logo" class="site-logo">
+        </div>
+    </header>
+
+    <!-- Shared navigation area -->
+    <nav class="nav-links">
+        {% block nav %}{% endblock %}
+    </nav>
+
+    <!-- Page-specific content -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+</div>
+
+</body>
+</html>

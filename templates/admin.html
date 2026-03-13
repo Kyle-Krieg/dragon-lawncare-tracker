@@ -1,10 +1,28 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Admin</title>
-</head>
-<body>
-    <h1>Admin Page</h1>
-    <a href="/">Home</a>
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block header_title %}Admin Dashboard{% endblock %}
+{% block header_subtitle %}Manage assignment, reopened tasks, and reports{% endblock %}
+
+{% block nav %}
+<a href="/" class="nav-button">Home</a>
+{% endblock %}
+
+{% block content %}
+
+<h2>Admin Actions</h2>
+
+<button onclick="location.href='/admin/assign'">
+    Assign Tasks
+</button>
+
+<button onclick="location.href='/admin/reopen'">
+    Reopen Tasks
+</button>
+
+<button onclick="location.href='/admin/reports'">
+    Completed Reports
+</button>
+
+{% endblock %}

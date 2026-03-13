@@ -1,15 +1,22 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Lawncare Scheduler</title>
-</head>
-<body>
+{% extends "base.html" %}
 
-<h1>Lawncare Task Manager</h1>
+{% block title %}Home{% endblock %}
+
+{% block header_title %}Lawncare Scheduler{% endblock %}
+{% block header_subtitle %}Task scheduling and reporting{% endblock %}
+
+{% block nav %}
+<a href="/employee" class="nav-button">Employee</a>
+<a href="/supervisor" class="nav-button">Supervisor</a>
+<a href="/admin" class="nav-button">Admin</a>
+{% endblock %}
+
+{% block content %}
+
+<h2>Select a Role</h2>
 
 <button onclick="location.href='/employee'">Employee</button>
 <button onclick="location.href='/supervisor'">Supervisor</button>
 <button onclick="location.href='/admin'">Admin</button>
 
-</body>
-</html>
+{% endblock %}

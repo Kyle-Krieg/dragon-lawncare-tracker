@@ -1,45 +1,43 @@
 {% extends "base.html" %}
 
-{% block title %}Employee Dashboard{% endblock %}
+{% block title %}Supervisor Tasks{% endblock %}
 
-{% block header_title %}Employee Dashboard{% endblock %}
-{% block header_subtitle %}View and complete assigned tasks{% endblock %}
+{% block header_title %}Supervisor Tasks{% endblock %}
+{% block header_subtitle %}View and complete tasks assigned to supervisors{% endblock %}
 
 {% block nav %}
 <a href="/" class="nav-button">Home</a>
+<a href="/supervisor" class="nav-button">Supervisor Dashboard</a>
 {% endblock %}
 
 {% block content %}
 
-<h2>Select Employee</h2>
-<select id="employee-select"></select>
+<h2>Select Supervisor</h2>
+<select id="supervisor-select"></select>
 
-<h2>My Tasks</h2>
+<h2>Assigned Tasks</h2>
 <div id="task-list"></div>
 
 <script>
 
 /*
-Stores the currently selected employee.
-This ID is used when retrieving tasks
-and when completing a task.
+Store the currently selected supervisor.
 */
-let selectedEmployeeId = null;
+let selectedSupervisorId = null;
 
 
 /*
-Load all active people and filter to only employees.
-Populate the dropdown selector.
+Load people and filter to supervisors only.
 */
 fetch("/people")
 .then(response => response.json())
 .then(people => {
 
-    const employees = people.filter(person => person.role === "employee");
+    const supervisors = people.filter(person => person.role === "supervisor");
 
-    const select = document.getElementById("employee-select");
+    const select = document.getElementById("supervisor-select");
 
-    employees.forEach(person => {
+    supervisors.forEach(person => {
 
         const option = document.createElement("option");
 
@@ -50,27 +48,18 @@ fetch("/people")
 
     });
 
+    if (supervisors.length > 0) {
 
-    /*
-    Automatically select the first employee
-    so the page loads with tasks visible.
-    */
-    if (employees.length > 0) {
-
-        selectedEmployeeId = employees[0].person_id;
-        select.value = selectedEmployeeId;
+        selectedSupervisorId = supervisors[0].person_id;
+        select.value = selectedSupervisorId;
 
         loadTasks();
 
     }
 
-
-    /*
-    Reload tasks when the selected employee changes.
-    */
     select.addEventListener("change", () => {
 
-        selectedEmployeeId = select.value;
+        selectedSupervisorId = select.value;
         loadTasks();
 
     });
@@ -79,11 +68,11 @@ fetch("/people")
 
 
 /*
-Retrieve active tasks assigned to the selected employee.
+Retrieve tasks assigned to the selected supervisor.
 */
 function loadTasks() {
 
-    fetch(`/employees/${selectedEmployeeId}/tasks`)
+    fetch(`/employees/${selectedSupervisorId}/tasks`)
     .then(response => response.json())
     .then(tasks => {
 
@@ -107,7 +96,9 @@ function loadTasks() {
                     <strong>${task.area_name}</strong> - ${task.task_name}<br>
                     <span>Scheduled: ${task.scheduled_for}</span>
                 </div>
-                <button onclick="completeTask(${task.task_id})">Complete</button>
+                <button onclick="completeTask(${task.task_id})">
+                    Complete
+                </button>
             `;
 
             list.appendChild(item);
@@ -121,8 +112,6 @@ function loadTasks() {
 
 /*
 Mark a task as completed.
-The backend records completion time
-and the worker who completed it.
 */
 function completeTask(taskId) {
 
@@ -132,7 +121,6 @@ function completeTask(taskId) {
     .then(response => response.json())
     .then(() => {
 
-        // Refresh tasks after completion
         loadTasks();
 
     });

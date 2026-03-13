@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Reopen Tasks{% endblock %}
+
+{% block header_title %}Admin - Reopen Tasks{% endblock %}
+{% block header_subtitle %}Reopen tasks that were completed incorrectly{% endblock %}
+
+{% block nav %}
+<a href="/" class="nav-button">Home</a>
+<a href="/admin" class="nav-button">Admin Dashboard</a>
+{% endblock %}
+
+{% block content %}
+
+<h2>Completed Tasks</h2>
+<div id="task-list"></div>
+
+<script>
+
+/*
+Load completed tasks so administrators
+can reopen them if necessary.
+*/
+function loadCompletedTasks() {
+
+    fetch("/completed/this_season")
+    .then(response => response.json())
+    .then(tasks => {
+
+        const list = document.getElementById("task-list");
+        list.innerHTML = "";
+
+        if (tasks.length === 0) {
+
+            list.innerHTML = "<p class='empty-message'>No completed tasks found.</p>";
+            return;
+
+        }
+
+        tasks.forEach(task => {
+
+            const item = document.createElement("div");
+            item.className = "task-item";
+
+            item.innerHTML = `
+                <div class="task-text">
+                    <strong>${task.area_name}</strong> - ${task.task_name}<br>
+                    <span>Scheduled: ${task.scheduled_for}</span>
+                </div>
+                <button onclick="reopenTask(${task.task_id})">
+                    Reopen
+                </button>
+            `;
+
+            list.appendChild(item);
+
+        });
+
+    });
+
+}
+
+
+/*
+Send request to reopen a completed task.
+*/
+function reopenTask(taskId) {
+
+    fetch(`/tasks/${taskId}/reopen`, {
+        method: "POST"
+    })
+    .then(response => response.json())
+    .then(() => {
+
+        loadCompletedTasks();
+
+    });
+
+}
+
+
+/* Load tasks when page opens */
+loadCompletedTasks();
+
+</script>
+
+{% endblock %}

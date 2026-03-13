@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+
+{% block title %}Supervisor Assign Tasks{% endblock %}
+
+{% block header_title %}Supervisor - Assign Tasks{% endblock %}
+{% block header_subtitle %}Assign unassigned tasks to workers{% endblock %}
+
+{% block nav %}
+<a href="/" class="nav-button">Home</a>
+<a href="/supervisor" class="nav-button">Supervisor Dashboard</a>
+{% endblock %}
+
+{% block content %}
+
+<h2>Select Person</h2>
+<select id="person-select"></select>
+
+<h2>Available Tasks</h2>
+<div id="task-list"></div>
+
+<script>
+
+/*
+Stores the currently selected worker
+that tasks will be assigned to.
+*/
+let selectedPersonId = null;
+
+
+/*
+Load active people from the API.
+Supervisors may assign tasks to both
+employees and supervisors, but not admins.
+*/
+fetch("/people")
+.then(response => response.json())
+.then(people => {
+
+    const assignablePeople = people.filter(person =>
+        person.role === "employee" || person.role === "supervisor"
+    );
+
+    const select = document.getElementById("person-select");
+
+    assignablePeople.forEach(person => {
+
+        const option = document.createElement("option");
+
+        option.value = person.person_id;
+        option.textContent = person.first_name + " " + person.last_name + " (" + person.role + ")";
+
+        select.appendChild(option);
+
+    });
+
+    if (assignablePeople.length > 0) {
+        selectedPersonId = assignablePeople[0].person_id;
+        select.value = selectedPersonId;
+    }
+
+    select.addEventListener("change", () => {
+        selectedPersonId = select.value;
+    });
+
+    loadTasks();
+
+});
+
+
+/*
+Retrieve tasks that are currently unassigned.
+*/
+function loadTasks() {
+
+    fetch("/assignable_tasks")
+    .then(response => response.json())
+    .then(tasks => {
+
+        const list = document.getElementById("task-list");
+        list.innerHTML = "";
+
+        if (tasks.length === 0) {
+
+            list.innerHTML = "<p class='empty-message'>No unassigned tasks available.</p>";
+            return;
+
+        }
+
+        tasks.forEach(task => {
+
+            const item = document.createElement("div");
+            item.className = "task-item";
+
+            item.innerHTML = `
+                <div class="task-text">
+                    <strong>${task.area_name}</strong> - ${task.task_name}<br>
+                    <span>Scheduled: ${task.scheduled_for}</span>
+                </div>
+                <button onclick="assignTask(${task.task_id})">
+                    Assign
+                </button>
+            `;
+
+            list.appendChild(item);
+
+        });
+
+    });
+
+}
+
+
+/*
+Send assignment request to the backend.
+*/
+function assignTask(taskId) {
+
+    if (!selectedPersonId) {
+
+        alert("Please select a person first.");
+        return;
+
+    }
+
+    fetch(`/employees/${selectedPersonId}/tasks/${taskId}/assign`, {
+        method: "POST"
+    })
+    .then(response => response.json())
+    .then(() => {
+
+        loadTasks();
+
+    });
+
+}
+
+</script>
+
+{% endblock %}

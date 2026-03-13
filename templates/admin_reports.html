@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Reports{% endblock %}
+
+{% block header_title %}Admin Reports{% endblock %}
+{% block header_subtitle %}View completed tasks by reporting period{% endblock %}
+
+{% block nav %}
+<a href="/" class="nav-button">Home</a>
+<a href="/admin" class="nav-button">Admin Dashboard</a>
+{% endblock %}
+
+{% block content %}
+
+<h2>Select Report Period</h2>
+
+<button onclick="loadReport('/completed/today')">Daily</button>
+<button onclick="loadReport('/completed/this_week')">Weekly</button>
+<button onclick="loadReport('/completed/this_month')">Monthly</button>
+<button onclick="loadReport('/completed/this_season')">Yearly</button>
+
+<h2>Completed Tasks</h2>
+<div id="task-list"></div>
+
+<script>
+
+/*
+Load completed task reports from the backend
+based on the selected reporting period.
+*/
+function loadReport(endpoint) {
+
+    fetch(endpoint)
+    .then(response => response.json())
+    .then(tasks => {
+
+        const list = document.getElementById("task-list");
+        list.innerHTML = "";
+
+        if (tasks.length === 0) {
+
+            list.innerHTML = "<p class='empty-message'>No completed tasks for this period.</p>";
+            return;
+
+        }
+
+        tasks.forEach(task => {
+
+            const item = document.createElement("div");
+            item.className = "task-item";
+
+            item.innerHTML = `
+                <div class="task-text">
+                    <strong>${task.area_name}</strong> - ${task.task_name}<br>
+                    <span>Scheduled: ${task.scheduled_for}</span><br>
+                    <span>Completed At: ${task.completed_at}</span>
+                </div>
+            `;
+
+            list.appendChild(item);
+
+        });
+
+    });
+
+}
+
+
+/* Default report view when page loads */
+loadReport('/completed/today');
+
+</script>
+
+{% endblock %}

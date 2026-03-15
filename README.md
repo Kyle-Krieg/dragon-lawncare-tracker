@@ -267,17 +267,6 @@ Planned improvements include:
 
 ---
 
-# Future Improvements
-
-Potential future enhancements include:
-
-- Route optimization for workers
-- AI-assisted scheduling
-- Natural language task creation
-- Mobile interface improvements
-
----
-
 # Application Purpose
 
 This application was created to streamline task management for recurring lawncare and maintenance work. Instead of relying on manual checklists and verbal communication, the system provides a centralized place to assign, track, and report completed tasks.

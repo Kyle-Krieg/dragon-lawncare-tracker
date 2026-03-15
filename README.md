@@ -178,6 +178,14 @@ dragon-lawncare-tracker
 │   ├── 002_seed.sql
 │   └── 003_views.sql
 │
+├── screenshots
+│   ├── completed_tasks.jpeg
+│   ├── employee.jpeg
+│   ├── homepage.jpeg
+│   ├── reopen_tasks.jpeg
+│   ├── supervisor_assign.jpeg
+│   └── supervisor_dashboard.jpeg
+│
 ├── static
 │   ├── style.css
 │   └── images
@@ -196,18 +204,21 @@ dragon-lawncare-tracker
 │   └── admin_reports.html
 ```
 
+---
+
 ### Key Directories
 
 **db/**  
 Contains the SQL files used to create and initialize the database schema, seed data, and database views.
+
+**screenshots/**  
+Contains application screenshots used in the README to show the UI and core workflows.
 
 **templates/**  
 HTML templates rendered by Flask using Jinja templating.
 
 **static/**  
 Static assets such as CSS and images used by the frontend.
-
----
 
 # Running the Project
 

@@ -211,7 +211,7 @@ def reopen_task(task_id):
     if updated_task:
         return jsonify(updated_task)
     else:
-        return jsonify({"error": "Task not found"}), 404
+        return jsonify({"error": "Task Not Found"}), 404
 
 
 # -----------------------------
